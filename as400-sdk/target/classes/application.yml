@@ -1,0 +1,11 @@
+ol:
+  jt400:
+    project:
+      as400Sdk:
+        host: as400.openlegacy.com
+        user: OPENLEGA1
+        password: '{cipher}b82101bb580a11f758216d05d1fcb84555d09da72a18856e8122a5cb1cb65524'
+        code-page: 37
+  license:
+    key: eyJhbGciOiJSUzI1NiJ9.eyJwcm9kdWN0Ijoib3BlbmxlZ2FjeS1jb3JlIiwic3ViIjoib2wiLCJpc3N1ZWRfYXQiOiIyMDIxLTAyLTE2VDEyOjUxOjAxWiIsInZhbGlkX2ZvciI6OTB9.GCiyHStqaXC7xUHlPyN7OkoIhqyyn8s4LkshlSaHdg68N2lYJSBq3x9EFHaJroGtSJVZfde7AYd36xtRgWQdgeiOqVtm8HlgiGYVWQWdmiLwA1aPUzcCMO30c3VyNi__R2U_jhb7uWhUsLqSuTYT_tdTXtEtP_dbdZdNw7NCEiHu-vWGZBuS1Z2z2At0WWZbTx5bDRGCX1PvSsahySVEPfiPvH5g3aXFLEyoYuOQiwsGZakMFujQBhwQ1AuU7VGeY3vzbeJz1PA-yO476B6xFWkt0nLNDlz-LLv6WcyP0MJaCSoNoLBievO5l3f6mtiK2v1MWMbQYmiMI8bZeSTNLw
+

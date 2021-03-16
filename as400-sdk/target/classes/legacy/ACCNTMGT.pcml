@@ -1,0 +1,44 @@
+<pcml version="4.0">
+   <!-- COBOL program: ACCNTMGT  -->
+   <!-- created: 03/03/21 17:39:12 -->
+   <!-- source: OPENLEGA11/QCBLSRC(ACCNTMGT) -->
+   <program name="ACCNTMGT" path="/QSYS.LIB/OPENLEGA11.LIB/ACCNTMGT.PGM">
+      <struct name="WS-ACCOUNT" usage="inputoutput">
+         <data name="WS-ACCT-NBR" type="char" length="12" usage="inherit" />
+         <data name="WS-FIRST-NAME" type="char" length="10" usage="inherit" />
+         <data name="WS-LAST-NAME" type="char" length="10" usage="inherit" />
+         <data name="WS-AGE" type="zoned" length="2" precision="0" usage="inherit" />
+         <data name="WS-ACCOUNT-ID" type="zoned" length="10" precision="0" usage="inherit" />
+         <struct name="WS-BIRTH-DATE" usage="inherit">
+            <data name="WS-YEAR" type="zoned" length="4" precision="0" usage="inherit" />
+            <data name="WS-MONTH" type="zoned" length="2" precision="0" usage="inherit" />
+            <data name="WS-DAY" type="zoned" length="2" precision="0" usage="inherit" />
+         </struct>
+         <data name="WS-TITLE" type="zoned" length="1" precision="0" usage="inherit" />
+         <struct name="WS-ADDRESS" usage="inherit">
+            <data name="WS-ADDRESS-NAME" type="char" length="30" usage="inherit" />
+            <data name="WS-ADDRESS-NUMBER" type="zoned" length="4" precision="0" usage="inherit" />
+            <data name="WS-APPARTMENT-NUMBER" type="zoned" length="4" precision="0" usage="inherit" />
+            <data name="WS-CITY" type="char" length="20" usage="inherit" />
+            <data name="WS-POSTAL-CODE" type="zoned" length="10" precision="0" usage="inherit" />
+            <data name="WS-COUNTRY" type="char" length="20" usage="inherit" />
+         </struct>
+         <struct name="WS-LOC" usage="inherit">
+            <data name="WS-FEES" type="zoned" length="12" precision="0" usage="inherit" />
+            <data name="WS-CHARGES" type="zoned" length="12" precision="0" usage="inherit" />
+            <data name="WS-WITHDRAWLS" type="zoned" length="12" precision="0" usage="inherit" />
+         </struct>
+         <struct name="WS-BANK-DET" usage="inherit">
+            <data name="WS-BANK-ID" type="zoned" length="3" precision="0" usage="inherit" />
+            <data name="WS-BRANCH-ID" type="zoned" length="4" precision="0" usage="inherit" />
+            <data name="WS-ISO-CNTRY-CD" type="char" length="2" usage="inherit" />
+         </struct>
+         <data name="WS-IBAN" type="char" length="50" usage="inherit" />
+         <data name="WS-CUR" type="char" length="3" usage="inherit" />
+         <data name="WS-BAL" type="zoned" length="18" precision="2" usage="inherit" />
+         <data name="ACTION" type="char" length="3" usage="inherit" />
+         <data name="ER-COD" type="char" length="4" usage="inherit" />
+         <data name="ER-MSG" type="char" length="50" usage="inherit" />
+      </struct>
+   </program>
+</pcml>

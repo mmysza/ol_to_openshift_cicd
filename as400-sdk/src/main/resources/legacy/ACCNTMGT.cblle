@@ -1,0 +1,364 @@
+000100130526       IDENTIFICATION DIVISION.                                                                                         
+000200200101       PROGRAM-ID. ACCNTMGT.                                                                                            
+000300181224       AUTHOR. AMIT SHARMA.                                                                                             
+000400181224                                                                                                                        
+000500181224       ENVIRONMENT DIVISION.                                                                                            
+000600181224         CONFIGURATION SECTION.                                                                                         
+000700181224         SOURCE-COMPUTER. IBM-AS400.                                                                                    
+000800181224         OBJECT-COMPUTER. IBM-AS400.                                                                                    
+000900181224                                                                                                                        
+001000181224       INPUT-OUTPUT SECTION.                                                                                            
+001100181224       FILE-CONTROL.                                                                                                    
+001200181226                   SELECT ACLIENT-FILE       ASSIGN TO DATABASE-ACLIENT                                                 
+001300181224                          ORGANIZATION   IS INDEXED                                                                     
+001400181224                          RECORD KEY     IS EXTERNALLY-DESCRIBED-KEY                                                    
+001500181224                          ACCESS MODE    IS RANDOM                                                                      
+001600181224                          FILE STATUS    IS CLIENT-FS.                                                                  
+001700181224                                                                                                                        
+001800181226                 SELECT ACLIENTLOC-FILE    ASSIGN TO DATABASE-ACLIENTLOC                                                
+001900181224                          ORGANIZATION   IS INDEXED                                                                     
+002000181224                          RECORD KEY     IS EXTERNALLY-DESCRIBED-KEY                                                    
+002100181224                          ACCESS MODE    IS RANDOM                                                                      
+002200181224                          FILE STATUS    IS CLIENTLOC-FS.                                                               
+002300181224                                                                                                                        
+002400181230                   SELECT ANXTACCTNO-FILE ASSIGN TO DATABASE-ANXTACCTNO                                                 
+002500181231                          ORGANIZATION   IS INDEXED                                                                     
+002600181231                          RECORD KEY     IS EXTERNALLY-DESCRIBED-KEY                                                    
+002700181231                          ACCESS MODE    IS RANDOM                                                                      
+002800181230                          FILE STATUS    IS NXTACCT-FS.                                                                 
+002900181230                                                                                                                        
+003000181224                                                                                                                        
+003100181224       DATA DIVISION.                                                                                                   
+003200181224       FILE SECTION.                                                                                                    
+003300181226          FD   ACLIENT-FILE                                                                                             
+003400181224               LABEL RECORDS ARE STANDARD.                                                                              
+003500181226          01   CLIENT-REC.                                                                                              
+003600181226               COPY DDS-ALL-FORMATS OF ACLIENT.                                                                         
+003700181224                                                                                                                        
+003800181226          FD   ACLIENTLOC-FILE                                                                                          
+003900181224               LABEL RECORDS ARE STANDARD.                                                                              
+004000181224          01   LOC-REC.                                                                                                 
+004100181226               COPY DDS-ALL-FORMATS OF ACLIENTLOC.                                                                      
+004200181226                                                                                                                        
+004300181230          FD   ANXTACCTNO-FILE                                                                                          
+004400181230               LABEL RECORDS ARE STANDARD.                                                                              
+004500181230          01   NXTACCT-REC.                                                                                             
+004600181230               COPY DDS-ALL-FORMATS OF ANXTACCTNO.                                                                      
+004700181230                                                                                                                        
+004800181224       WORKING-STORAGE SECTION.                                                                                         
+004801200104       01  ws-current-date-data.                                                                                        
+004802200104           05 ws-current-date.                                                                                          
+004803200104              10 ws-current-year      pic 9(04).                                                                        
+004804200104              10 ws-current-month     pic 9(02).                                                                        
+004805200104              10 ws-current-day       pic 9(02).                                                                        
+004806200104           05 ws-current-time.                                                                                          
+004807200104              10 ws-current-hours     pic 9(02).                                                                        
+004808200104              10 ws-current-minute    pic 9(02).                                                                        
+004809200104              10 ws-s                 pic 9(02).                                                                        
+004810200104              10 ws-current-ms        pic 9(02).                                                                        
+004900181224       77  CLIENT-FOUND PIC X   VALUE "0".                                                                              
+005000181224       77  LOC-FOUND    PIC X   VALUE "0".                                                                              
+005100181230       77  NXTA-FOUND   PIC X   VALUE "0".                                                                              
+005200181224       77  CLIENTLOC-FS PIC 9(02).                                                                                      
+005300200101       77  RANDOM-NMBER PIC 9(02).                                                                                      
+005500200101       77  CLIENT-FS    PIC 9(02).                                                                                      
+005501200104       77  seed         PIC 9(02).                                                                                      
+005600181226       77  BANK-FS      PIC 9(02).                                                                                      
+005700181230       77  NXTACCT-FS   PIC 9(02).                                                                                      
+005800181224       77  X            PIC 999 VALUE 000.                                                                              
+005900181226       77  TEMP-CLIENT-ID PIC 9(12).                                                                                    
+006000181226       77  TEMP-CLIENT-ID-X REDEFINES TEMP-CLIENT-ID PIC A(12).                                                         
+006200130609       LINKAGE SECTION.                                                                                                 
+006300200101       01 WS-ACCOUNT.                                                                                                   
+006400200101          05 WS-ACCT-NBR   PIC A(12).                                                                                   
+006500200101          05 WS-FIRST-NAME PIC A(10).                                                                                   
+006600200101          05 WS-LAST-NAME PIC A(10).                                                                                    
+006700200101          05 WS-AGE PIC 9(2).                                                                                           
+006800200101          05 WS-ACCOUNT-ID PIC 9(10).                                                                                   
+006900200101          05 WS-ACCOUNT-ID-X redefines WS-ACCOUNT-ID PIC X(10).                                                         
+007000200101          05 WS-BIRTH-DATE.                                                                                             
+007100200101                 10 WS-YEAR PIC 9(04).                                                                                  
+007200200101                 10 WS-MONTH PIC 9(02).                                                                                 
+007300200101                 10 WS-DAY PIC 9(02).                                                                                   
+007400200101          05 WS-TITLE PIC 9.                                                                                            
+007500200101          05 WS-ADDRESS.                                                                                                
+007600200101                 10 WS-ADDRESS-NAME        PIC A(30).                                                                   
+007700200101                 10 WS-ADDRESS-NUMBER      PIC 9(04).                                                                   
+007800200101                 10 WS-APPARTMENT-NUMBER   PIC 9(04).                                                                   
+007900200101                 10 WS-CITY                PIC A(20).                                                                   
+008000200101                 10 WS-POSTAL-CODE         PIC 9(10).                                                                   
+008100200101                 10 WS-COUNTRY             PIC A(20).                                                                   
+008200200101          05 WS-LOC.                                                                                                    
+008300200101                 10 WS-FEES                PIC 9(12).                                                                   
+008400200101                 10 WS-CHARGES             PIC 9(12).                                                                   
+008500200101                 10 WS-WITHDRAWLS          PIC 9(12).                                                                   
+008600200101          05 WS-BANK-DET.                                                                                               
+008700200206                 10 WS-BANK-ID             PIC 9(03).                                                                   
+008800200206                 10 WS-BRANCH-ID           PIC 9(04).                                                                   
+008900200101                 10 WS-ISO-CNTRY-CD        PIC x(02).                                                                   
+009000200101          05 WS-IBAN                    PIC A(50).                                                                      
+009100200101          05 WS-CUR    PIC A(03).                                                                                       
+009200200206          05 WS-BAL    PIC 9(16)V99.                                                                                    
+009300200101          05 ACTION    PIC A(03).                                                                                       
+009400200101          05 ER-COD    PIC A(04).                                                                                       
+009500200101          05 ER-MSG    PIC A(50).                                                                                       
+009600200101       PROCEDURE DIVISION USING WS-ACCOUNT.                                                                             
+009700130609       BEGIN.                                                                                                           
+009800181224           PERFORM OPEN-FILES.                                                                                          
+009900181223           COMPUTE X = 0 .                                                                                              
+010000181223           PERFORM PROCESSING-01 THRU END-PROCESSING-01.                                                                
+010100181224           PERFORM CLOSE-FILES.                                                                                         
+010200181223           STOP RUN.                                                                                                    
+010300181223                                                                                                                        
+010400181223       PROCESSING-01.                                                                                                   
+010500181224           COMPUTE X = X + 1.                                                                                           
+010600181224                   PERFORM PROCESS-RTV-CUST                                                                             
+010700181231                   PERFORM PROCESS-ACTION-CUST.                                                                         
+010800181223       END-PROCESSING-01.                                                                                               
+010900181231           EXIT.                                                                                                        
+011000181223                                                                                                                        
+011100181224       PROCESS-RTV-CUST.                                                                                                
+011200181224           MOVE "0"              TO CLIENT-FOUND.                                                                       
+011300181224           MOVE "0"              TO LOC-FOUND.                                                                          
+011400181231                                                                                                                        
+011500200104           MOVE WS-IBAN of ws-account TO IBAN  OF CLIENTREC.                                                            
+011600181226           READ ACLIENT-FILE                                                                                            
+011700181224                INVALID KEY                                                                                             
+011800181224                MOVE "0"         TO CLIENT-FOUND                                                                        
+011900181224                NOT INVALID KEY                                                                                         
+012000181224                MOVE "1"         TO CLIENT-FOUND.                                                                       
+012100181224                                                                                                                        
+012200181230           MOVE WS-IBAN       TO IBAN     OF LOCREC.                                                                    
+012300181226           READ ACLIENTLOC-FILE                                                                                         
+012400181224                INVALID KEY                                                                                             
+012500181224                MOVE "0"         TO LOC-FOUND                                                                           
+012600181224                NOT INVALID KEY                                                                                         
+012700181224                MOVE "1"         TO LOC-FOUND.                                                                          
+012800181224                                                                                                                        
+012900181224       PROCESS-ACTION-CUST.                                                                                             
+013000200101           IF ACTION  = "RTV" THEN                                                                                      
+013100181224              IF CLIENT-FOUND = "1" THEN                                                                                
+013200200101                 MOVE ACCTNBR    TO WS-ACCT-NBR                                                                         
+013300200101                 MOVE FIRSTNAME  TO WS-FIRST-NAME                                                                       
+013400200101                 MOVE LASTNAME   TO WS-LAST-NAME                                                                        
+013500200101                 MOVE AGE        TO WS-AGE                                                                              
+013600200101                 MOVE BIRTHYR    TO WS-YEAR                                                                             
+013700200101                 MOVE BIRTHMT    TO WS-MONTH                                                                            
+013800200101                 MOVE BIRTHDY    TO WS-DAY                                                                              
+013900200101                 MOVE GENDER     TO WS-TITLE                                                                            
+014000200101                 MOVE ADDNAME    TO WS-ADDRESS-NAME                                                                     
+014100200101                 MOVE ADDNUM     TO WS-ADDRESS-NUMBER                                                                   
+014200200101                 MOVE APTNUM  TO WS-APPARTMENT-NUMBER                                                                   
+014300200101                 MOVE CITY       TO WS-CITY                                                                             
+014400200101                 MOVE POSTCODE   TO WS-POSTAL-CODE                                                                      
+014500200101                 MOVE COUNTRY    TO WS-COUNTRY                                                                          
+014600181231                 MOVE BANKID     OF CLIENTREC    TO WS-BANK-ID                                                          
+014700181231                 MOVE BRANCHID   OF CLIENTREC    TO WS-BRANCH-ID                                                        
+014800181231                 MOVE ISOCNTRYCD OF CLIENTREC TO WS-ISO-CNTRY-CD                                                        
+014900190107                 MOVE CURRANCY   OF CLIENTREC TO WS-CUR                                                                 
+015000190107                 MOVE BALANCE    OF CLIENTREC TO WS-BAL                                                                 
+015100190102                 MOVE "CLIENT DETAIL FOUND"     TO ER-MSG                                                               
+015200181224              ELSE                                                                                                      
+015300181224                 MOVE "CLIENT DETAIL NOT FOUND" TO ER-MSG                                                               
+015400181224              END-IF                                                                                                    
+015500181224              IF LOC-FOUND    = "1" THEN                                                                                
+015600200101                 MOVE FEE        TO WS-FEES                                                                             
+015700200101                 MOVE CHARGES    TO WS-CHARGES                                                                          
+015800200101                 MOVE WITHDRAWLS TO WS-WITHDRAWLS                                                                       
+015900181224              ELSE                                                                                                      
+016000181224                 MOVE "LOC    DETAIL NOT FOUND" TO ER-MSG                                                               
+016100181224              END-IF                                                                                                    
+016200181224           END-IF.                                                                                                      
+016300181224                                                                                                                        
+016400200101           IF ACTION   = "ADD" THEN                                                                                     
+016500181224              IF CLIENT-FOUND = "0" THEN                                                                                
+016600200101                 MOVE WS-ACCOUNT-ID    TO                                                                               
+016700181224                                       CLIENTID OF CLIENTREC                                                            
+016800181230                                                                                                                        
+016900200101                 MOVE WS-ISO-CNTRY-CD TO                                                                                
+017000181231                         ISOCNTRYCD   OF ACCTREC                                                                        
+017100200101                 MOVE WS-BANK-ID   TO BANKID   OF ACCTREC                                                               
+017200200101                 MOVE WS-BRANCH-ID TO BRANCHID OF ACCTREC                                                               
+017300181230                 READ ANXTACCTNO-FILE                                                                                   
+017400181231                     INVALID KEY                                                                                        
+017500181231                       MOVE  "000000000001" TO ACCTNBR OF CLIENTREC                                                     
+017600181231                       MOVE  "000000000002" TO NXTACCTNBR                                                               
+017700181231                       WRITE   NXTACCT-REC                                                                              
+017800181231                       END-WRITE                                                                                        
+017900181231                     NOT INVALID KEY                                                                                    
+018000181231                       MOVE  NXTACCTNBR TO ACCTNBR OF CLIENTREC                                                         
+018100181231                       MOVE  NXTACCTNBR TO TEMP-CLIENT-ID-X                                                             
+018200181231                       COMPUTE TEMP-CLIENT-ID = TEMP-CLIENT-ID + 1                                                      
+018300181231                       MOVE TEMP-CLIENT-ID-X TO  NXTACCTNBR                                                             
+018400181231                       REWRITE NXTACCT-REC                                                                              
+018500181231                       END-REWRITE                                                                                      
+018600181231                 END-READ                                                                                               
+018700181231                                                                                                                        
+018800181231                 MOVE ACCTNBR OF CLIENTREC          TO WS-ACCT-NBR                                                      
+018900200101                 MOVE WS-FIRST-NAME TO FIRSTNAME                                                                        
+019000200101                 MOVE WS-LAST-NAME  TO LASTNAME                                                                         
+019100200101                 MOVE WS-AGE        TO AGE                                                                              
+019200200101                 MOVE WS-YEAR       TO BIRTHYR                                                                          
+019300200101                 MOVE WS-MONTH      TO BIRTHMT                                                                          
+019400200101                 MOVE WS-DAY        TO BIRTHDY                                                                          
+019500200101                 MOVE WS-TITLE     TO GENDER                                                                            
+019600200101                 MOVE WS-ADDRESS-NAME TO ADDNAME                                                                        
+019700200101                 MOVE WS-ADDRESS-NUMBER TO ADDNUM                                                                       
+019800200101                 MOVE WS-APPARTMENT-NUMBER TO APTNUM                                                                    
+019900200101                 MOVE WS-CITY              TO CITY                                                                      
+020000200101                 MOVE WS-POSTAL-CODE       TO POSTCODE                                                                  
+020100200101                 MOVE WS-COUNTRY           TO COUNTRY                                                                   
+020200200101                 MOVE WS-BANK-ID           TO BANKID                                                                    
+020300181231                                      OF CLIENTREC                                                                      
+020400200101                 MOVE WS-BRANCH-ID    TO BRANCHID                                                                       
+020500181231                                      OF CLIENTREC                                                                      
+020600200101                 MOVE WS-ISO-CNTRY-CD TO ISOCNTRYCD                                                                     
+020700181231                                      OF CLIENTREC                                                                      
+020800200101                 MOVE WS-CUR          TO CURRANCY                                                                       
+020900190107                                      OF CLIENTREC                                                                      
+021000200101                 MOVE WS-BAL          TO BALANCE                                                                        
+021100190107                                      OF CLIENTREC                                                                      
+021200200104                 move function current-date to ws-current-date-data                                                     
+021202200104                 compute random-nmber= function random (ws-s) * 98 + 1                                                  
+021400200101                 MOVE SPACE to WS-IBAN                                                                                  
+021501200106                 STRING ws-iso-cntry-cd delimited by size                                                               
+021600200106                        RANDOM-NMBER    DELIMITED BY SIZE                                                               
+021601200106                        WS-BRANCH-ID    DELIMITED BY size                                                               
+021703200106                        WS-BANK-ID      DELIMITED BY Size                                                               
+022101200106                        WS-ACCT-NBR     DELIMITED BY Size                                                               
+022200200101                        INTO      WS-IBAN                                                                               
+022300181230                 MOVE   WS-IBAN             TO IBAN OF CLIENTREC                                                        
+022400181224                 WRITE                             CLIENT-REC                                                           
+022500190102                 NOT INVALID KEY                                                                                        
+022600190102                 MOVE "CLIENT ACCOUNT DETAILS ADDED"   TO ER-MSG                                                        
+022700190102                 INVALID KEY                                                                                            
+022800181224                 MOVE "ERROR WRITING TO CLIENT DETAIL" TO ER-MSG                                                        
+022900181224              ELSE                                                                                                      
+023000181224                 MOVE "CLIENT DETAIL EXISTS"    TO ER-MSG                                                               
+023100181224              END-IF                                                                                                    
+023200181224              IF LOC-FOUND    = "0" THEN                                                                                
+023300200101                 MOVE WS-ACCOUNT-ID                                                                                     
+023400181224                                    TO CLIENTID OF LOCREC                                                               
+023500200101                 MOVE WS-FEES       TO FEE                                                                              
+023600200101                 MOVE WS-CHARGES    TO CHARGES                                                                          
+023700200101                 MOVE WS-WITHDRAWLS TO WITHDRAWLS                                                                       
+023800181230                 MOVE WS-IBAN                       TO IBAN OF LOCREC                                                   
+023900181224                 WRITE                             LOC-REC                                                              
+024000181224                 INVALID KEY                                                                                            
+024100181224                 MOVE "ERROR WRITING TO CLIENT LOC"    TO ER-MSG                                                        
+024200181224              ELSE                                                                                                      
+024300181224                 MOVE "LOC    DETAIL EXISTS"    TO ER-MSG                                                               
+024400181224              END-IF                                                                                                    
+024500181224           END-IF.                                                                                                      
+024600181224                                                                                                                        
+024700200101           IF ACTION   = "CHG" THEN                                                                                     
+024800181224              IF LOC-FOUND    = "1" THEN                                                                                
+024801200106                 IF ws-fees is not zero then                                                                            
+024900200106                     MOVE WS-FEES TO FEE                                                                                
+024901200106                 end-if                                                                                                 
+024902200106                 IF ws-charges is not zero then                                                                         
+025000200106                     MOVE WS-CHARGES    TO CHARGES                                                                      
+025001200106                 end-if                                                                                                 
+025002200106                 IF ws-withdrawls is not zero then                                                                      
+025100200106                     MOVE WS-WITHDRAWLS TO WITHDRAWLS                                                                   
+025101200106                 end-if                                                                                                 
+025200181224                 REWRITE                           LOC-REC                                                              
+025300190102                 INVALID KEY                                                                                            
+025400181224                 MOVE "ERROR UPDATING LOC DETAILS"     TO ER-MSG                                                        
+025500181224              ELSE                                                                                                      
+025600181224                 MOVE "LOC    DETAIL NOT FOUND" TO ER-MSG                                                               
+025700181224              END-IF                                                                                                    
+025800181224              IF CLIENT-FOUND = "1" THEN                                                                                
+025801200106                 IF ws-first-name is not = space then                                                                   
+025900200106                     MOVE WS-FIRST-NAME TO FIRSTNAME                                                                    
+025901200106                 end-if                                                                                                 
+025902200106                 IF ws-last-name is not = space then                                                                    
+026000200106                     MOVE WS-LAST-NAME  TO LASTNAME                                                                     
+026001200106                 end-if                                                                                                 
+026002200106                 IF ws-age is not zero then                                                                             
+026100200106                     MOVE WS-AGE        TO AGE                                                                          
+026101200106                 end-if                                                                                                 
+026102200106                 IF ws-year is not zero then                                                                            
+026200200106                     MOVE WS-YEAR       TO BIRTHYR                                                                      
+026201200106                 end-if                                                                                                 
+026202200106                 IF ws-month is not zero then                                                                           
+026300200106                     MOVE WS-MONTH      TO BIRTHMT                                                                      
+026301200106                 end-if                                                                                                 
+026302200106                 IF ws-day is not zero then                                                                             
+026400200106                     MOVE WS-DAY        TO BIRTHDY                                                                      
+026401200106                 end-if                                                                                                 
+026402200106                 IF ws-title is not zero then                                                                           
+026500200106                     MOVE WS-TITLE     TO GENDER                                                                        
+026501200106                 end-if                                                                                                 
+026502200106                 IF ws-address-name is not = space then                                                                 
+026600200106                     MOVE WS-ADDRESS-NAME   TO ADDNAME                                                                  
+026601200106                 end-if                                                                                                 
+026602200106                 IF ws-address-number is not zero then                                                                  
+026700200106                     MOVE WS-ADDRESS-NUMBER TO ADDNUM                                                                   
+026701200106                 end-if                                                                                                 
+026702200106                 IF ws-appartment-number is not zero then                                                               
+026800200106                     MOVE WS-APPARTMENT-NUMBER TO APTNUM                                                                
+026801200106                 end-if                                                                                                 
+026802200106                 IF ws-city is not = space then                                                                         
+026900200106                     MOVE WS-CITY           TO CITY                                                                     
+026901200106                 end-if                                                                                                 
+026902200106                 IF ws-postal-code is not zero  then                                                                    
+027000200106                     MOVE WS-POSTAL-CODE    TO POSTCODE                                                                 
+027001200106                 end-if                                                                                                 
+027002200106                 IF ws-country is not = space then                                                                      
+027100200106                     MOVE WS-COUNTRY        TO COUNTRY                                                                  
+027101200106                 end-if                                                                                                 
+027102200104      * Changes made on Jan/04/2019                                                                                     
+027103200106                 IF ws-acct-nbr is not = space then                                                                     
+027104200106                     MOVE WS-ACCT-NBR       TO ACCTNBR                                                                  
+027105200106                 end-if                                                                                                 
+027106200206                 IF ws-bank-id is not zero then                                                                         
+027107200106                     MOVE WS-BANK-ID        TO BANKID  of clientrec                                                     
+027108200106                 end-if                                                                                                 
+027109200206                 IF ws-branch-id is not zero then                                                                       
+027110200106                     MOVE WS-BRANCH-ID      TO BRANCHID of clientrec                                                    
+027111200106                 end-if                                                                                                 
+027112200106                 IF ws-iso-cntry-cd is not = space then                                                                 
+027113200106                     MOVE WS-ISO-CNTRY-CD   TO ISOCNTRYCD of clientrec                                                  
+027114200106                 end-if                                                                                                 
+027115200106                 IF ws-cur is not = space then                                                                          
+027116200106                     MOVE WS-CUR            TO CURRANCY                                                                 
+027117200106                 end-if                                                                                                 
+027118200104      * Changes made on Jan/04/2019                                                                                     
+027200181224                 REWRITE                           CLIENT-REC                                                           
+027300190102                 NOT INVALID KEY                                                                                        
+027400190102                 MOVE "CLIENT DETAILS UPDATED"         TO ER-MSG                                                        
+027500181224                 INVALID KEY                                                                                            
+027600181224                 MOVE "ERROR UPDATING CLIENT DETAILS"  TO ER-MSG                                                        
+027700181224              ELSE                                                                                                      
+027800181224                 MOVE "CLIENT DETAIL NOT FOUND" TO ER-MSG                                                               
+027900181224              END-IF                                                                                                    
+028000181224           END-IF.                                                                                                      
+028100181224                                                                                                                        
+028200200101           IF ACTION   = "DEL" THEN                                                                                     
+028300181226              IF LOC-FOUND    = "1" THEN                                                                                
+028400181226                 DELETE                            ACLIENTLOC-FILE                                                      
+028500181226                 INVALID KEY                                                                                            
+028600181226                 MOVE "ERROR DELETEING CLIENT LOC DETAILS"  TO ER-MSG                                                   
+028700181226              ELSE                                                                                                      
+028800181226                 MOVE "LOC    DETAIL NOT FOUND" TO ER-MSG                                                               
+028900181226              END-IF                                                                                                    
+029000181224              IF CLIENT-FOUND = "1" THEN                                                                                
+029100181226                 DELETE                            ACLIENT-FILE                                                         
+029200190102                 NOT INVALID KEY                                                                                        
+029300190102                 MOVE "CLIENT ACCOUNT DETAILS DELETED"  TO ER-MSG                                                       
+029400181224                 INVALID KEY                                                                                            
+029500181224                 MOVE "ERROR DELETEING CLIENT DETAILS"  TO ER-MSG                                                       
+029600181224              ELSE                                                                                                      
+029700181224                 MOVE "CLIENT DETAIL NOT FOUND" TO ER-MSG                                                               
+029800181224              END-IF                                                                                                    
+029900181224           END-IF.                                                                                                      
+030000181224                                                                                                                        
+030100181224       OPEN-FILES.                                                                                                      
+030200181226           OPEN I-O ACLIENT-FILE.                                                                                       
+030300181226           OPEN I-O ACLIENTLOC-FILE.                                                                                    
+030400181230           OPEN I-O ANXTACCTNO-FILE.                                                                                    
+030500181224       CLOSE-FILES.                                                                                                     
+030600181226           CLOSE    ACLIENT-FILE.                                                                                       
+030700181226           CLOSE    ACLIENTLOC-FILE.                                                                                    
+030800181230           CLOSE    ANXTACCTNO-FILE.                                                                                    
