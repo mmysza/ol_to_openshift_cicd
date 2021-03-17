@@ -3,29 +3,17 @@ kind: BuildConfig
 metadata:
   annotations:
     description: Build configuration for the runtime build.
-  creationTimestamp: '2021-02-24T09:30:32Z'
-  labels:
-    app: savingsplan-api
-    template: frame-application-1.0
-    template.openshift.io/template-instance-owner: f0f63ec3-7682-11eb-a949-000d3a8387b0
-  name: savingsplan-api-run
+  creationTimestamp: '2021-02-24T09:30:32Z'  
+  name: as400-api-run
   namespace: 040102-savingsplan-01
-  resourceVersion: '146319619'
-  selfLink: >-
-    /apis/build.openshift.io/v1/namespaces/040102-savingsplan-01/buildconfigs/savingsplan-api-run
-  uid: f10832c9-7682-11eb-a949-000d3a8387b0
+  resourceVersion: '146319619' 
 spec:
   failedBuildsHistoryLimit: 5
   nodeSelector: null
   output:
     to:
       kind: ImageStreamTag
-      name: 'savingsplan-api:latest'
-  postCommit:
-    script: >-
-      export
-      JAVA_OPTS='-Djavax.net.ssl.trustStore=/opt/apache/tomcat/base/conf/cacerts
-      -Dstage=dev01'
+      name: 'as400-api:latest'  
   resources:
     limits:
       cpu: '1'
@@ -36,76 +24,25 @@ spec:
   runPolicy: Serial
   source:
     dockerfile: >-
-      FROM openjdk:11-slim
-      COPY '.coba-savingsplan-api/target/coba-savingsplan-api.jar' /usr/local
-      RUN chmod +x ./usr/local/coba-savingsplan-api.jar
-      CMD ["java", "-jar", "./usr/local/coba-savingsplan-api.jar"]
-
+      FROM anywhere
+      COPY 'as400-api.jar' /usr/local
+      RUN chmod +x ./usr/local/as400-api.jar
+      CMD ["java", "-jar", "./usr/local/as400-api.jar"]
     images:
       - as: null
         from:
           kind: ImageStreamTag
-          name: 'savingsplan-api-build:latest'
-        paths:
+          name: 'as400-api-build:latest'
+        paths:          
           - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/coba-savingsplan-api.war
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/dhbcore.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/com.ibm.mqjms-7.1.0.5.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/com.ibm.mq-7.1.0.5.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/com.ibm.mq.jmqi-7.1.0.5.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/com.ibm.mq.headers-7.1.0.5.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/com.ibm.mq.commonservices-7.1.0.5.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/javax.jms-api-2.0.1.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/imsico-13.2.0.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/j2ca-base-7.0.0.0.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/db2jcc_license_cisuz-4.8.86.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/connector2-3.5.3.5.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/db2jcc_license_cu-4.8.86.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/db2jcc4-4.8.86.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/geronimo-commonj_1.1_spec-1.0.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/src/main/resources/foo-commonj-1.1.0.jar
-          - destinationDir: .
-            sourcePath: /tmp/src/target/classes/server.xml
+            sourcePath: /tmp/as400-api.jar
     type: Dockerfile
   strategy:
     dockerStrategy:
-      env:
-        - name: DEPLOYABLE
-          value: coba-savingsplan-api.war
-        - name: DEPLOYABLE_FINAL_NAME
-          value: savingsplan
-      from:
-        kind: ImageStreamTag
-        name: 'cbk-tomcat-base:9.0.14'
-        namespace: commerzbank
+       from:
+        kind: DockerImage
+        name: 'fabric8/s2i-java:latest-java11'     
     type: Docker
-  successfulBuildsHistoryLimit: 5
-  triggers:
-    - imageChange:
-        lastTriggeredImageID: >-
-          docker-registry.default.svc:5000/commerzbank/cbk-tomcat-base@sha256:199f69edc994d648e4727a6b0a6a1c8f07c4dccd8670de8a98a8a436bf42cd9b
-      type: ImageChange
-    - imageChange:
-        from:
-          kind: ImageStreamTag
-          name: 'savingsplan-api-build:latest'
-        lastTriggeredImageID: >-
-          docker-registry.default.svc:5000/040102-savingsplan-01/savingsplan-api-build@sha256:e7ae2f2265b8b7f25cd612d73a1fcfe5d2db4437b1b75dbebea7747eb5c21f74
-      type: ImageChange
+  successfulBuildsHistoryLimit: 5 
 status:
   lastVersion: 69

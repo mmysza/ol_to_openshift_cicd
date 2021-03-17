@@ -2,41 +2,33 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   annotations:
-    description: Build configuration for the artifact build.  
+    description: Build configuration for the artifact build.
+  creationTimestamp: '2021-03-16T15:57:58Z'
   name: as400-api-build
   namespace: build-test
-  resourceVersion: '146315487'  
-  uid: f104db44-7682-11eb-a949-000d3a8387b0
+  resourceVersion: '983428477'
+  selfLink: >-
+    /apis/build.openshift.io/v1/namespaces/build-test/buildconfigs/as400-api-build
+  uid: 60ccf672-8670-11eb-a946-0645a759894e
 spec:
-  failedBuildsHistoryLimit: 2
   nodeSelector: null
   output:
     to:
       kind: ImageStreamTag
       name: 'as400-api-build:latest'
   postCommit: {}
-  resources:
-    limits:
-      cpu: '1'
-      memory: 1800M
-    requests:
-      cpu: '1'
-      memory: 1800M
+  resources: {}
   runPolicy: Serial
   source:
     git:
       ref: develop
-      uri: >-
-        https://github.com/mmysza/ol_to_openshift_cicd.git    
+      uri: 'https://github.com/mmysza/ol_to_openshift_cicd.git'
     type: Git
   strategy:
     sourceStrategy:
-      env:
-        - name: MAVEN_COMMANDLINE
-          value: mvn clean install -B
       from:
-        kind: ImageStreamTag
-        name: 'hub.docker.com/maven:3-jdk-11-slim' 
+        kind: DockerImage
+        name: 'fabric8/s2i-java:latest-java11'
       incremental: false
     type: Source
   successfulBuildsHistoryLimit: 5
@@ -46,4 +38,4 @@ spec:
           name: git-as400-secret
       type: Generic
 status:
-  lastVersion: 60
+  lastVersion: 73
