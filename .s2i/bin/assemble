@@ -24,4 +24,4 @@ mvn -s settings.xml ${MVN_GOALS:-clean package} -DskipTests=${MVN_SKIP_TESTS:-tr
 
 echo "---> Copying built application to app-root..."
 # TODO this may fail if there are more than one jar generated
-cp -a ./as400-api/target/*.jar /opt/app-root/app.jar
+cp -a ./as400-api/target/*.jar /tmp/as400-api.jar
