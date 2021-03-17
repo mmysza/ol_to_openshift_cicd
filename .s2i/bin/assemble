@@ -19,7 +19,7 @@ echo "---> Installing application source..."
 cp -Rf /tmp/src/. ./
 
 echo "---> Building application from source..."
-mvn ${MVN_GOALS:-clean package} -DskipTests=${MVN_SKIP_TESTS:-true} \
+mvn -s settings.xml ${MVN_GOALS:-clean package} -DskipTests=${MVN_SKIP_TESTS:-true} \
   -Dmaven.skip.tests=${MVN_SKIP_TESTS:-true} ${MVN_OPTS}
 
 echo "---> Copying built application to app-root..."
